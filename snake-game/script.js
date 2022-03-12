@@ -1,4 +1,4 @@
-const CELL_SIZE = 20
+const CELL_SIZE = 15
 const CANVAS_SIZE = 600
 const REDRAW_INTERVAL = 50
 const WIDTH = CANVAS_SIZE / CELL_SIZE
@@ -58,10 +58,141 @@ let apples = [
   },
 ]
 
-function drawCell(ctx, x, y, color) {
-  ctx.fillStyle = color
-  ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-}
+let obstacles = [
+  { level: 1, walls: [] },
+  {
+    level: 2,
+    walls: [
+      {
+        startX: 13,
+        startY: 20,
+        endX: 26,
+        endY: 20,
+        width: CELL_SIZE,
+        height: CELL_SIZE / 2,
+      },
+    ],
+  },
+  {
+    level: 3,
+    walls: [
+      {
+        startX: 23,
+        startY: 20,
+        endX: 36,
+        endY: 20,
+        width: CELL_SIZE,
+        height: CELL_SIZE / 2,
+      },
+      {
+        startX: 9,
+        startY: 30,
+        endX: 22,
+        endY: 30,
+        width: CELL_SIZE,
+        height: CELL_SIZE / 2,
+      },
+    ],
+  },
+  {
+    level: 4,
+    walls: [
+      {
+        startX: 23,
+        startY: 20,
+        endX: 36,
+        endY: 20,
+        width: CELL_SIZE,
+        height: CELL_SIZE / 2,
+      },
+      {
+        startX: 9,
+        startY: 30,
+        endX: 22,
+        endY: 30,
+        width: CELL_SIZE,
+        height: CELL_SIZE / 2,
+      },
+      {
+        startX: 4,
+        startY: 10,
+        endX: 17,
+        endY: 10,
+        width: CELL_SIZE,
+        height: CELL_SIZE / 2,
+      },
+    ],
+  },
+  {
+    level: 5,
+    walls: [
+      {
+        startX: 25,
+        startY: 13,
+        endX: 36,
+        endY: 13,
+        width: CELL_SIZE,
+        height: CELL_SIZE / 2,
+      },
+      {
+        startX: 7,
+        startY: 22,
+        endX: 19,
+        endY: 22,
+        width: CELL_SIZE,
+        height: CELL_SIZE / 2,
+      },
+      {
+        startX: 32,
+        startY: 22,
+        endX: 36,
+        endY: 22,
+        width: CELL_SIZE,
+        height: CELL_SIZE / 2,
+      },
+      {
+        startX: 13,
+        startY: 30,
+        endX: 26,
+        endY: 30,
+        width: CELL_SIZE,
+        height: CELL_SIZE / 2,
+      },
+      {
+        startX: 0,
+        startY: 0,
+        endX: 39,
+        endY: 0,
+        width: CELL_SIZE,
+        height: CELL_SIZE,
+      },
+      {
+        startX: 0,
+        startY: 39,
+        endX: 39,
+        endY: 39,
+        width: CELL_SIZE,
+        height: CELL_SIZE,
+      },
+      {
+        startX: 0,
+        startY: 0,
+        endX: 0,
+        endY: 39,
+        width: CELL_SIZE,
+        height: CELL_SIZE,
+      },
+      {
+        startX: 39,
+        startY: 0,
+        endX: 39,
+        endY: 39,
+        width: CELL_SIZE,
+        height: CELL_SIZE,
+      },
+    ],
+  },
+]
 
 function drawScore(snake) {
   let scoreCanvas
@@ -112,12 +243,29 @@ function drawSnakeHead(ctx, snake) {
   }
 }
 
+function drawObstacles(ctx, snake, obstacles) {
+  let walls = obstacles.find(function (element) {
+    return element.level === snake.level
+  }).walls
+
+  ctx.fillStyle = 'grey'
+  for (let i = 0; i < walls.length; i++) {
+    for (let j = walls[i].startX; j <= walls[i].endX; j++) {
+      for (let k = walls[i].startY; k <= walls[i].endY; k++) {
+        ctx.fillRect(j * CELL_SIZE, k * CELL_SIZE, walls[i].width, walls[i].height)
+      }
+    }
+  }
+}
+
 function draw() {
   setInterval(function () {
     let snakeCanvas = document.getElementById('snakeBoard')
     let ctx = snakeCanvas.getContext('2d')
 
     ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
+
+    drawObstacles(ctx, snake, obstacles)
 
     drawSnakeHead(ctx, snake)
     var bodyImage = document.getElementById('snake-body')
@@ -217,13 +365,27 @@ function moveUp(snake) {
   eat(snake, apples)
 }
 
+function checkObstaclesCollision(snake, obstacles) {
+  let walls = obstacles.find(function (element) {
+    return element.level === snake.level
+  }).walls
+
+  for (let i = 0; i < walls.length; i++) {
+    if (snake.head.x >= walls[i].startX && snake.head.x <= walls[i].endX && snake.head.y >= walls[i].startY && snake.head.y <= walls[i].endY) {
+      return true
+    }
+  }
+
+  return false
+}
+
 function checkGameover(snakes) {
   let isGameover = false
   //this
   for (let i = 0; i < snakes.length; i++) {
     for (let j = 0; j < snakes.length; j++) {
       for (let k = 1; k < snakes[j].body.length; k++) {
-        if (snakes[i].head.x == snakes[j].body[k].x && snakes[i].head.y == snakes[j].body[k].y) {
+        if ((snakes[i].head.x == snakes[j].body[k].x && snakes[i].head.y == snakes[j].body[k].y) || checkObstaclesCollision(snakes[i], obstacles)) {
           isGameover = true
         }
       }
@@ -236,6 +398,16 @@ function checkGameover(snakes) {
       document.getElementById('gameover').play()
       alert('Game Over!')
       snake = initSnake('green')
+      apples = [
+        {
+          color: 'red',
+          position: initPosition(),
+        },
+        {
+          color: 'green',
+          position: initPosition(),
+        },
+      ]
     } else {
       snake = {
         ...snake,
