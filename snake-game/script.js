@@ -74,9 +74,9 @@ function drawSpeed(snake) {
   let speedCtx = speedCanvas.getContext('2d')
 
   speedCtx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
-  speedCtx.font = '30px Arial'
+  speedCtx.font = '20px Arial'
   speedCtx.fillStyle = snake.color
-  speedCtx.fillText(Math.floor(1000 / MOVE_INTERVAL), 35, speedCanvas.scrollHeight / 2)
+  speedCtx.fillText(MOVE_INTERVAL + ' .ms', 10, speedCanvas.scrollHeight / 2)
 }
 
 function draw() {
