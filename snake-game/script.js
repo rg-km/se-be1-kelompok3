@@ -10,7 +10,7 @@ const DIRECTION = {
   DOWN: 3,
 }
 
-const MOVE_INTERVAL = 120
+const MOVE_INTERVAL = 200
 
 function initPosition() {
   return {
@@ -66,7 +66,17 @@ function drawScore(snake) {
   scoreCtx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
   scoreCtx.font = '30px Arial'
   scoreCtx.fillStyle = snake.color
-  scoreCtx.fillText(snake.score, 10, scoreCanvas.scrollHeight / 2)
+  scoreCtx.fillText(snake.score, 35, scoreCanvas.scrollHeight / 2)
+}
+
+function drawSpeed(snake) {
+  let speedCanvas = document.getElementById('speedBoard')
+  let speedCtx = speedCanvas.getContext('2d')
+
+  speedCtx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
+  speedCtx.font = '30px Arial'
+  speedCtx.fillStyle = snake.color
+  speedCtx.fillText(Math.floor(1000 / MOVE_INTERVAL), 35, speedCanvas.scrollHeight / 2)
 }
 
 function draw() {
@@ -89,6 +99,7 @@ function draw() {
     }
 
     drawScore(snake)
+    drawSpeed(snake)
   }, REDRAW_INTERVAL)
 }
 
