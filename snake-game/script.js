@@ -1,4 +1,4 @@
-const CELL_SIZE = 15
+const CELL_SIZE = 20
 const CANVAS_SIZE = 600
 const REDRAW_INTERVAL = 50
 const WIDTH = CANVAS_SIZE / CELL_SIZE
@@ -10,7 +10,7 @@ const DIRECTION = {
   DOWN: 3,
 }
 
-const MOVE_INTERVAL = 120
+const MOVE_INTERVAL = 200
 
 function initPosition() {
   return {
@@ -66,7 +66,17 @@ function drawScore(snake) {
   scoreCtx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
   scoreCtx.font = '30px Arial'
   scoreCtx.fillStyle = snake.color
-  scoreCtx.fillText(snake.score, 10, scoreCanvas.scrollHeight / 2)
+  scoreCtx.fillText(snake.score, 35, scoreCanvas.scrollHeight / 2)
+}
+
+function drawSpeed(snake) {
+  let speedCanvas = document.getElementById('speedBoard')
+  let speedCtx = speedCanvas.getContext('2d')
+
+  speedCtx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
+  speedCtx.font = '20px Arial'
+  speedCtx.fillStyle = snake.color
+  speedCtx.fillText(MOVE_INTERVAL + ' .ms', 10, speedCanvas.scrollHeight / 2)
 }
 
 function drawSnakeHead(ctx, snake) {
@@ -100,8 +110,9 @@ function draw() {
     ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
 
     drawSnakeHead(ctx, snake)
+    var bodyImage = document.getElementById('snake-body')
     for (let i = 1; i < snake.body.length; i++) {
-      drawCell(ctx, snake.body[i].x, snake.body[i].y, snake.color)
+      ctx.drawImage(bodyImage, snake.body[i].x * CELL_SIZE, snake.body[i].y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
     }
 
     for (let i = 0; i < apples.length; i++) {
@@ -112,6 +123,7 @@ function draw() {
     }
 
     drawScore(snake)
+    drawSpeed(snake)
   }, REDRAW_INTERVAL)
 }
 
