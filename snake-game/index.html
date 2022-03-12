@@ -12,11 +12,13 @@
     <img src="assets/snake-body.png" alt="Snake Body" id="snake-body" style="display: none" width="20" height="20" />
     <!-- Snake Life -->
     <img id="life" style="display: none" width="20" height="20" src="assets/life.png" alt="Life" />
-
-    <audio id = "gameover" controls preload = "none" hidden src="assets/sound/gameover.mp3"></audio>
+    <!-- Game Over Sound -->
+    <audio id="gameover" controls preload="none" hidden src="assets/sound/gameover.mp3"></audio>
+    <!-- Level Up Sound -->
+    <audio id="level-up" controls preload="none" hidden src="assets/sound/level-up.mp3"></audio>
     <div style="display: flex; justify-content: center">
       <div id="snakeBoard-container">
-        <h1>Snake</h1>
+        <h1>Snake: <span id="snakeLevel"></span></h1>
         <!-- Snake Board where game is played -->
         <canvas id="snakeBoard" width="600" height="600" style="border: 1px solid #000000"></canvas>
       </div>
