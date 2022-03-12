@@ -40,7 +40,7 @@ function initSnake(color) {
     score: 0,
   }
 }
-let snake = initSnake('purple')
+let snake = initSnake('green')
 
 let apples = [
   {
@@ -79,6 +79,29 @@ function drawSpeed(snake) {
   speedCtx.fillText(MOVE_INTERVAL + ' .ms', 10, speedCanvas.scrollHeight / 2)
 }
 
+function drawSnakeHead(ctx, snake) {
+  var img
+  // Check which direction snake headed
+  switch (snake.direction) {
+    case DIRECTION.LEFT:
+      img = document.getElementById('snake-head-left')
+      ctx.drawImage(img, snake.head.x * CELL_SIZE - 10, snake.head.y * CELL_SIZE, CELL_SIZE + 10, CELL_SIZE)
+      break
+    case DIRECTION.RIGHT:
+      img = document.getElementById('snake-head-right')
+      ctx.drawImage(img, snake.head.x * CELL_SIZE, snake.head.y * CELL_SIZE, CELL_SIZE + 10, CELL_SIZE)
+      break
+    case DIRECTION.UP:
+      img = document.getElementById('snake-head-up')
+      ctx.drawImage(img, snake.head.x * CELL_SIZE, snake.head.y * CELL_SIZE - 10, CELL_SIZE, CELL_SIZE + 10)
+      break
+    case DIRECTION.DOWN:
+      img = document.getElementById('snake-head-down')
+      ctx.drawImage(img, snake.head.x * CELL_SIZE, snake.head.y * CELL_SIZE, CELL_SIZE, CELL_SIZE + 10)
+      break
+  }
+}
+
 function draw() {
   setInterval(function () {
     let snakeCanvas = document.getElementById('snakeBoard')
@@ -86,9 +109,10 @@ function draw() {
 
     ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
 
-    drawCell(ctx, snake.head.x, snake.head.y, snake.color)
+    drawSnakeHead(ctx, snake)
+    var bodyImage = document.getElementById('snake-body')
     for (let i = 1; i < snake.body.length; i++) {
-      drawCell(ctx, snake.body[i].x, snake.body[i].y, snake.color)
+      ctx.drawImage(bodyImage, snake.body[i].x * CELL_SIZE, snake.body[i].y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
     }
 
     for (let i = 0; i < apples.length; i++) {
@@ -167,7 +191,7 @@ function checkCollision(snakes) {
   }
   if (isCollide) {
     alert('Game over')
-    snake = initSnake('purple')
+    snake = initSnake('green')
   }
   return isCollide
 }
