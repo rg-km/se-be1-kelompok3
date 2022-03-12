@@ -53,6 +53,27 @@ let apples = [
   },
 ]
 
+let lifes = [
+  {
+    position : {
+      x: 0,
+      y: 0
+    }
+  },
+  {
+    position : {
+      x: 1,
+      y: 0
+    }
+  },
+  {
+    position : {
+      x: 2,
+      y: 0
+    }
+  }
+]
+
 function drawCell(ctx, x, y, color) {
   ctx.fillStyle = color
   ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
@@ -122,6 +143,13 @@ function draw() {
       ctx.drawImage(img, apple.position.x * CELL_SIZE, apple.position.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
     }
 
+    for (let i = 0; i < lifes.length; i++) {
+      let life = lifes[i]
+
+      var img = document.getElementById('life')
+      ctx.drawImage(img, life.position.x * CELL_SIZE, life.position.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+    }
+
     drawScore(snake)
     drawSpeed(snake)
   }, REDRAW_INTERVAL)
@@ -189,10 +217,7 @@ function checkCollision(snakes) {
       }
     }
   }
-  if (isCollide) {
-    alert('Game over')
-    snake = initSnake('green')
-  }
+ 
   return isCollide
 }
 
@@ -217,7 +242,10 @@ function move(snake) {
       move(snake)
     }, MOVE_INTERVAL)
   } else {
-    initGame()
+    setTimeout(function () {
+      lifes.length--
+      snake = initSnake()
+    }, MOVE_INTERVAL)
   }
 }
 
