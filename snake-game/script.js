@@ -38,6 +38,10 @@ function initSnake(color) {
     ...initHeadAndBody(),
     direction: initDirection(),
     score: 0,
+    lifepos :[{ x: 0, y: 0 },
+    {x:1, y: 0},
+    {x:2, y: 0}
+    ]
   }
 }
 let snake = initSnake('green')
@@ -53,26 +57,7 @@ let apples = [
   },
 ]
 
-let lifes = [
-  {
-    position : {
-      x: 0,
-      y: 0
-    }
-  },
-  {
-    position : {
-      x: 1,
-      y: 0
-    }
-  },
-  {
-    position : {
-      x: 2,
-      y: 0
-    }
-  }
-]
+
 
 function drawCell(ctx, x, y, color) {
   ctx.fillStyle = color
@@ -143,11 +128,11 @@ function draw() {
       ctx.drawImage(img, apple.position.x * CELL_SIZE, apple.position.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
     }
 
-    for (let i = 0; i < lifes.length; i++) {
-      let life = lifes[i]
+    for (let i = 0; i < snake.lifepos.length; i++) {
 
       var img = document.getElementById('life')
-      ctx.drawImage(img, life.position.x * CELL_SIZE, life.position.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+      ctx.drawImage(img, snake.lifepos[i].x * CELL_SIZE, snake.lifepos[i].y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+      
     }
 
     drawScore(snake)
@@ -205,20 +190,27 @@ function moveUp(snake) {
   eat(snake, apples)
 }
 
-function checkCollision(snakes) {
-  let isCollide = false
+function checkGameover(snakes) {
+  let isGameover = false
   //this
   for (let i = 0; i < snakes.length; i++) {
     for (let j = 0; j < snakes.length; j++) {
       for (let k = 1; k < snakes[j].body.length; k++) {
         if (snakes[i].head.x == snakes[j].body[k].x && snakes[i].head.y == snakes[j].body[k].y) {
-          isCollide = true
+          snake.lifepos.pop()
+          if(snake.lifepos.length === 0){
+            isGameover = true
+          }
         }
       }
     }
   }
  
-  return isCollide
+  if(isGameover){
+    alert('Game Over!')
+    snake = initSnake('green')
+  }
+  return isGameover
 }
 
 function move(snake) {
@@ -237,15 +229,12 @@ function move(snake) {
       break
   }
   moveBody(snake)
-  if (!checkCollision([snake])) {
+  if (!checkGameover([snake])) {
     setTimeout(function () {
       move(snake)
     }, MOVE_INTERVAL)
-  } else {
-    setTimeout(function () {
-      lifes.length--
-      snake = initSnake()
-    }, MOVE_INTERVAL)
+  } else  {
+      initGame()
   }
 }
 
