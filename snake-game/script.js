@@ -194,6 +194,8 @@ let obstacles = [
   },
 ]
 
+let lifes = []
+
 function drawScore(snake) {
   let scoreCanvas
   scoreCanvas = document.getElementById('score1Board')
@@ -258,6 +260,27 @@ function drawObstacles(ctx, snake, obstacles) {
   }
 }
 
+function checkPrima(score) {
+  if (score <= 1) {
+    return false
+  }
+
+  for (var i = 2; i < score; i++) {
+    if (score % i === 0) {
+      return false
+    }
+  }
+
+  return true
+}
+
+function drawLifeGain(ctx, life) {
+  let lifeImg = document.getElementById('life-icon')
+  setTimeout(function () {
+    ctx.drawImage(lifeImg, life.pos.x * CELL_SIZE, life.pos.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+  }, REDRAW_INTERVAL / 2)
+}
+
 function draw() {
   setInterval(function () {
     let snakeCanvas = document.getElementById('snakeBoard')
@@ -278,6 +301,10 @@ function draw() {
 
       var img = document.getElementById('apple')
       ctx.drawImage(img, apple.position.x * CELL_SIZE, apple.position.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+    }
+
+    for (let i = 0; i < lifes.length; i++) {
+      drawLifeGain(ctx, lifes[i])
     }
 
     for (let i = 0; i < snake.lifepos.length; i++) {
@@ -336,7 +363,21 @@ function eat(snake, apples) {
         document.getElementById('level-up').play()
         alert('Level Up')
       }
+
+      // Check if the score is prime
+      if (checkPrima(snake.score)) {
+        lifes.push({ pos: initPosition() })
+      }
       snake.body.push({ x: snake.head.x, y: snake.head.y })
+    }
+  }
+}
+
+function eatlife(snake, lifes) {
+  for (let i = 0; i < lifes.length; i++) {
+    if (snake.head.x === lifes[i].pos.x && snake.head.y === lifes[i].pos.y) {
+      snake.lifepos.push({ x: snake.lifepos.length + 1, y: 1 })
+      lifes.splice(i, 1)
     }
   }
 }
@@ -345,24 +386,28 @@ function moveLeft(snake) {
   snake.head.x--
   teleport(snake)
   eat(snake, apples)
+  eatlife(snake, lifes)
 }
 
 function moveRight(snake) {
   snake.head.x++
   teleport(snake)
   eat(snake, apples)
+  eatlife(snake, lifes)
 }
 
 function moveDown(snake) {
   snake.head.y++
   teleport(snake)
   eat(snake, apples)
+  eatlife(snake, lifes)
 }
 
 function moveUp(snake) {
   snake.head.y--
   teleport(snake)
   eat(snake, apples)
+  eatlife(snake, lifes)
 }
 
 function checkObstaclesCollision(snake, obstacles) {
@@ -409,6 +454,7 @@ function checkGameover(snakes, obstacles) {
           position: initPosition(),
         },
       ]
+      lifes = []
     } else {
       snake = {
         ...snake,
