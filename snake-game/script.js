@@ -266,7 +266,7 @@ function checkPrima(score){
   var x = 0
   for(var i = 2; i<= Math.floor(score/2); i++){
     x++
-    if(score%1 === 0 ){
+    if(score%i === 0 ){
       return false
     }
   }
@@ -308,6 +308,8 @@ function draw() {
       var img = document.getElementById('life')
       ctx.drawImage(img, snake.lifepos[i].x * CELL_SIZE, snake.lifepos[i].y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
     }
+
+    drawLifeGain(ctx, snake, life)
 
 
     
@@ -370,10 +372,11 @@ function eat(snake, apples) {
 
 function eatlife(snake, life){
   if (snake.head.x == life.pos.x && snake.head.y == life.pos.y) {
-  life = initPosition()
   snake.lifepos.push({x: snake.lifepos.length + 1, y : 1})
+  life.pos = initPosition()
   }
 }
+
 
 function moveLeft(snake) {
   snake.head.x--
