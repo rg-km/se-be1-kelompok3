@@ -194,6 +194,10 @@ let obstacles = [
   },
 ]
 
+let life = {
+  pos : initPosition()
+}
+
 function drawScore(snake) {
   let scoreCanvas
   scoreCanvas = document.getElementById('score1Board')
@@ -258,6 +262,26 @@ function drawObstacles(ctx, snake, obstacles) {
   }
 }
 
+function checkPrima(score){
+  var x = 0
+  for(var i = 2; i<= Math.floor(score/2); i++){
+    x++
+    if(score%1 === 0 ){
+      return false
+    }
+  }
+  return true
+}
+
+function drawLifeGain (ctx, snake, life){
+  if(checkPrima(snake.score)){
+    var img = document.getElementById('life')
+    ctx.drawImage(img, life.pos.x * CELL_SIZE,  life.pos.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+  }
+}
+
+
+
 function draw() {
   setInterval(function () {
     let snakeCanvas = document.getElementById('snakeBoard')
@@ -266,7 +290,7 @@ function draw() {
     ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
 
     drawObstacles(ctx, snake, obstacles)
-
+    
     drawSnakeHead(ctx, snake)
     var bodyImage = document.getElementById('snake-body')
     for (let i = 1; i < snake.body.length; i++) {
@@ -284,6 +308,9 @@ function draw() {
       var img = document.getElementById('life')
       ctx.drawImage(img, snake.lifepos[i].x * CELL_SIZE, snake.lifepos[i].y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
     }
+
+
+    
 
     drawScore(snake)
     drawSpeed(snake)
@@ -341,28 +368,39 @@ function eat(snake, apples) {
   }
 }
 
+function eatlife(snake, life){
+  if (snake.head.x == life.pos.x && snake.head.y == life.pos.y) {
+  life = initPosition()
+  snake.lifepos.push({x: snake.lifepos.length + 1, y : 1})
+  }
+}
+
 function moveLeft(snake) {
   snake.head.x--
   teleport(snake)
   eat(snake, apples)
+  eatlife(snake, life)
 }
 
 function moveRight(snake) {
   snake.head.x++
   teleport(snake)
   eat(snake, apples)
+  eatlife(snake, life)
 }
 
 function moveDown(snake) {
   snake.head.y++
   teleport(snake)
   eat(snake, apples)
+  eatlife(snake, life)
 }
 
 function moveUp(snake) {
   snake.head.y--
   teleport(snake)
   eat(snake, apples)
+  eatlife(snake, life)
 }
 
 function checkObstaclesCollision(snake, obstacles) {
