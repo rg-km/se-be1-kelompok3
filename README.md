@@ -1,6 +1,6 @@
 # Snake Game
 
-![Snake Game Screenshot](./game-screenshot.png?raw=true)
+![Screenshot 2022-03-13 223949](https://user-images.githubusercontent.com/58742114/158068158-71ee76b2-ef82-4af5-83b7-891ea0f6e1a8.png)
 
 Snake game developed using JavaScript and HTML5. This game is made for the final project of Software Engineering course Ruangguru CAMP.
 
