@@ -194,9 +194,7 @@ let obstacles = [
   },
 ]
 
-let life = {
-  pos : initPosition()
-}
+let lifes = []
 
 function drawScore(snake) {
   let scoreCanvas
@@ -262,25 +260,26 @@ function drawObstacles(ctx, snake, obstacles) {
   }
 }
 
-function checkPrima(score){
-  var x = 0
-  for(var i = 2; i<= Math.floor(score/2); i++){
-    x++
-    if(score%i === 0 ){
+function checkPrima(score) {
+  if (score <= 1) {
+    return false
+  }
+
+  for (var i = 2; i < score; i++) {
+    if (score % i === 0) {
       return false
     }
   }
+
   return true
 }
 
-function drawLifeGain (ctx, snake, life){
-  if(checkPrima(snake.score)){
-    var img = document.getElementById('life')
-    ctx.drawImage(img, life.pos.x * CELL_SIZE,  life.pos.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-  }
+function drawLifeGain(ctx, life) {
+  let lifeImg = document.getElementById('life-icon')
+  setTimeout(function () {
+    ctx.drawImage(lifeImg, life.pos.x * CELL_SIZE, life.pos.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+  }, REDRAW_INTERVAL / 2)
 }
-
-
 
 function draw() {
   setInterval(function () {
@@ -290,7 +289,7 @@ function draw() {
     ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
 
     drawObstacles(ctx, snake, obstacles)
-    
+
     drawSnakeHead(ctx, snake)
     var bodyImage = document.getElementById('snake-body')
     for (let i = 1; i < snake.body.length; i++) {
@@ -304,15 +303,14 @@ function draw() {
       ctx.drawImage(img, apple.position.x * CELL_SIZE, apple.position.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
     }
 
+    for (let i = 0; i < lifes.length; i++) {
+      drawLifeGain(ctx, lifes[i])
+    }
+
     for (let i = 0; i < snake.lifepos.length; i++) {
       var img = document.getElementById('life')
       ctx.drawImage(img, snake.lifepos[i].x * CELL_SIZE, snake.lifepos[i].y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
     }
-
-    drawLifeGain(ctx, snake, life)
-
-
-    
 
     drawScore(snake)
     drawSpeed(snake)
@@ -365,45 +363,51 @@ function eat(snake, apples) {
         document.getElementById('level-up').play()
         alert('Level Up')
       }
+
+      // Check if the score is prime
+      if (checkPrima(snake.score)) {
+        lifes.push({ pos: initPosition() })
+      }
       snake.body.push({ x: snake.head.x, y: snake.head.y })
     }
   }
 }
 
-function eatlife(snake, life){
-  if (snake.head.x == life.pos.x && snake.head.y == life.pos.y) {
-  snake.lifepos.push({x: snake.lifepos.length + 1, y : 1})
-  life.pos = initPosition()
+function eatlife(snake, lifes) {
+  for (let i = 0; i < lifes.length; i++) {
+    if (snake.head.x === lifes[i].pos.x && snake.head.y === lifes[i].pos.y) {
+      snake.lifepos.push({ x: snake.lifepos.length + 1, y: 1 })
+      lifes.splice(i, 1)
+    }
   }
 }
-
 
 function moveLeft(snake) {
   snake.head.x--
   teleport(snake)
   eat(snake, apples)
-  eatlife(snake, life)
+  eatlife(snake, lifes)
 }
 
 function moveRight(snake) {
   snake.head.x++
   teleport(snake)
   eat(snake, apples)
-  eatlife(snake, life)
+  eatlife(snake, lifes)
 }
 
 function moveDown(snake) {
   snake.head.y++
   teleport(snake)
   eat(snake, apples)
-  eatlife(snake, life)
+  eatlife(snake, lifes)
 }
 
 function moveUp(snake) {
   snake.head.y--
   teleport(snake)
   eat(snake, apples)
-  eatlife(snake, life)
+  eatlife(snake, lifes)
 }
 
 function checkObstaclesCollision(snake, obstacles) {
@@ -450,6 +454,7 @@ function checkGameover(snakes, obstacles) {
           position: initPosition(),
         },
       ]
+      lifes = []
     } else {
       snake = {
         ...snake,
