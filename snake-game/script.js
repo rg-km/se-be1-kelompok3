@@ -379,17 +379,18 @@ function checkObstaclesCollision(snake, obstacles) {
   return false
 }
 
-function checkGameover(snakes) {
+function checkGameover(snakes, obstacles) {
   let isGameover = false
-  //this
-  for (let i = 0; i < snakes.length; i++) {
-    for (let j = 0; j < snakes.length; j++) {
-      for (let k = 1; k < snakes[j].body.length; k++) {
-        if ((snakes[i].head.x == snakes[j].body[k].x && snakes[i].head.y == snakes[j].body[k].y) || checkObstaclesCollision(snakes[i], obstacles)) {
-          isGameover = true
-        }
-      }
+  // Check whether snake collide with its body
+  for (let k = 1; k < snakes.body.length; k++) {
+    if (snakes.head.x == snakes.body[k].x && snakes.head.y == snakes.body[k].y) {
+      isGameover = true
     }
+  }
+
+  // Check whether snake collide with obstacles
+  if (checkObstaclesCollision(snakes, obstacles)) {
+    isGameover = true
   }
 
   if (isGameover) {
@@ -434,7 +435,7 @@ function move(snake) {
       break
   }
   moveBody(snake)
-  if (!checkGameover([snake])) {
+  if (!checkGameover(snake, obstacles)) {
     setTimeout(function () {
       move(snake)
     }, snake.speed)
