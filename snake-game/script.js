@@ -49,11 +49,9 @@ let snake = initSnake('green')
 
 let apples = [
   {
-    color: 'red',
     position: initPosition(),
   },
   {
-    color: 'green',
     position: initPosition(),
   },
 ]
@@ -245,6 +243,25 @@ function drawSnakeHead(ctx, snake) {
   }
 }
 
+function checkWallOverlap(obstacles, snake, icon) {
+  let walls = obstacles.find(function (element) {
+    return element.level === snake.level
+  }).walls
+
+  for (let i = 0; i < walls.length; i++) {
+    if (
+      walls[i].startX <= icon.position.x &&
+      walls[i].endX >= icon.position.x &&
+      walls[i].startY <= icon.position.y &&
+      walls[i].endY >= icon.position.y
+    ) {
+      return true
+    }
+  }
+
+  return false
+}
+
 function drawObstacles(ctx, snake, obstacles) {
   let walls = obstacles.find(function (element) {
     return element.level === snake.level
@@ -277,7 +294,7 @@ function checkPrima(score) {
 function drawLifeGain(ctx, life) {
   let lifeImg = document.getElementById('life-icon')
   setTimeout(function () {
-    ctx.drawImage(lifeImg, life.pos.x * CELL_SIZE, life.pos.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+    ctx.drawImage(lifeImg, life.position.x * CELL_SIZE, life.position.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
   }, REDRAW_INTERVAL / 2)
 }
 
@@ -355,6 +372,9 @@ function eat(snake, apples) {
     let apple = apples[i]
     if (snake.head.x == apple.position.x && snake.head.y == apple.position.y) {
       apple.position = initPosition()
+      while (checkWallOverlap(obstacles, snake, apple) || snake.body.includes(apple)) {
+        apple.position = initPosition()
+      }
       snake.score++
       // Check level up
       if (snake.score % 5 === 0 && snake.level < 5) {
@@ -366,7 +386,12 @@ function eat(snake, apples) {
 
       // Check if the score is prime
       if (checkPrima(snake.score)) {
-        lifes.push({ pos: initPosition() })
+        let newLife = { position: initPosition() }
+        console.log(newLife.position.x)
+        while (checkWallOverlap(obstacles, snake, newLife) || snake.body.includes(newLife)) {
+          newLife.position = initPosition()
+        }
+        lifes.push(newLife)
       }
       snake.body.push({ x: snake.head.x, y: snake.head.y })
     }
@@ -375,7 +400,7 @@ function eat(snake, apples) {
 
 function eatlife(snake, lifes) {
   for (let i = 0; i < lifes.length; i++) {
-    if (snake.head.x === lifes[i].pos.x && snake.head.y === lifes[i].pos.y) {
+    if (snake.head.x === lifes[i].position.x && snake.head.y === lifes[i].position.y) {
       snake.lifepos.push({ x: snake.lifepos.length + 1, y: 1 })
       lifes.splice(i, 1)
     }
@@ -446,11 +471,9 @@ function checkGameover(snakes, obstacles) {
       snake = initSnake('green')
       apples = [
         {
-          color: 'red',
           position: initPosition(),
         },
         {
-          color: 'green',
           position: initPosition(),
         },
       ]
